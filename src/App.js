@@ -44,7 +44,7 @@ class App extends React.Component {
   }
 
   getExcerpts = async () => {
-    const response = await fetch("https://127.0.0.1:5000/excerpts");
+    const response = await fetch("https://chloe-typeracer.herokuapp.com/excerpts");
     const data = await response.json()
     console.log('data', data)
   };
@@ -57,7 +57,7 @@ class App extends React.Component {
         ? window.location.search.split("=")[1]
         : null;
     if (!accessToken && !existingToken) {
-      window.location.replace(`https://127.0.0.1:5000`);
+      window.location.replace(`https://chloe-typeracer.herokuapp.com`);
     }
 
     if (accessToken) {
@@ -157,7 +157,7 @@ class App extends React.Component {
 
   //backend endpoint
   async getUserInfo(){
-    const res = await fetch("https://127.0.0.1:5000/getuser", {
+    const res = await fetch("https://chloe-typeracer.herokuapp.com/getuser", {
       headers:{
         "Content-Type": "application/json",
         "Authorization": `Token ${this.state.token}`
@@ -177,7 +177,7 @@ class App extends React.Component {
   }
 
   postScore = async (wpm, elapsed) => {
-    const resp = await fetch("https://127.0.0.1:5000/scores", {
+    const resp = await fetch("https://chloe-typeracer.herokuapp.com/scores", {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',
@@ -276,9 +276,9 @@ class App extends React.Component {
           <i onClick={this._restartGame} className="fa fa-lg fa-refresh"></i>
           <i className="fa fa-lg fa-bars" onClick={this._changeView}></i>
           {this.state.user ? (
-            <button onClick={()=>window.location.replace('https://127.0.0.1:5000/logout')}> <div>Sign Out</div></button>
+            <button onClick={()=>window.location.replace('https://chloe-typeracer.herokuapp.com/logout')}> <div>Sign Out</div></button>
           ) : (
-            <button onClick={()=>window.location.replace('https://127.0.0.1:5000/login/facebook')}> <div> Sign In</div> </button>
+            <button onClick={()=>window.location.replace('https://chloe-typeracer.herokuapp.com/login/facebook')}> <div> Sign In</div> </button>
             )}
         </div>
         {this.state.user ? this.renderGame() : this.renderSignin()}
