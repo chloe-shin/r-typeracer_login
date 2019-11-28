@@ -17,7 +17,6 @@ class App extends React.Component {
       window.location.search.split("=")[0] === "?api_key"
         ? window.location.search.split("=")[1]
         : null;
-
  
     this.state = {
       token: existingToken || accessToken,
@@ -31,7 +30,7 @@ class App extends React.Component {
       lineView: false,
       startTime: null,
       completed: false,
-      excerpt: this._randomElement(this.props.excerpts)
+      excerpt: ''
     };
   }
 
@@ -44,8 +43,18 @@ class App extends React.Component {
   }
 
   getExcerpts = async () => {
-    const response = await fetch("https://chloe-typeracer.herokuapp.com/excerpts");
+    const response = await fetch(process.env.REACT_APP_URL+"/excerpts");
     const data = await response.json()
+    if (response.ok) {
+      console.log(data);
+      const randomObject = this._randomElement(data.data)
+      this.setState({ 
+        excerptId:randomObject.id,
+        excerpt: randomObject.body,
+        excerpts:data.data })
+    } else {
+      this.setState({ error: "Could not load" });
+    }
     console.log('data', data)
   };
 
@@ -57,7 +66,7 @@ class App extends React.Component {
         ? window.location.search.split("=")[1]
         : null;
     if (!accessToken && !existingToken) {
-      window.location.replace(`https://chloe-typeracer.herokuapp.com`);
+      window.location.replace(process.env.REACT_APP_URL);
     }
 
     if (accessToken) {
@@ -73,8 +82,8 @@ class App extends React.Component {
   }
 
   _randomElement = array => {
-    return this.props.excerpts[
-      Math.floor(Math.random() * this.props.excerpts.length)
+    return array[
+      Math.floor(Math.random() * array.length)
     ];
   };
 
@@ -133,7 +142,7 @@ class App extends React.Component {
         startTime: null,
         completed: false,
         result: null,
-        excerpt: this._randomElement(this.props.excerpts)
+        excerpt: this._randomElement(this.state.excerpts) 
       },
       () => this.intervals.map(clearInterval)
     );
@@ -157,7 +166,7 @@ class App extends React.Component {
 
   //backend endpoint
   async getUserInfo(){
-    const res = await fetch("https://chloe-typeracer.herokuapp.com/getuser", {
+    const res = await fetch(process.env.REACT_APP_URL+"/getuser", {
       headers:{
         "Content-Type": "application/json",
         "Authorization": `Token ${this.state.token}`
@@ -177,13 +186,14 @@ class App extends React.Component {
   }
 
   postScore = async (wpm, elapsed) => {
-    const resp = await fetch("https://chloe-typeracer.herokuapp.com/scores", {
+    const resp = await fetch(process.env.REACT_APP_URL+"/scores", {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Token ${this.state.token}`
       },
       body: JSON.stringify({
+        id : this.state.excerptId,
         wpm,
         time: elapsed,
         errorCount: this.state.errorCount
@@ -276,9 +286,9 @@ class App extends React.Component {
           <i onClick={this._restartGame} className="fa fa-lg fa-refresh"></i>
           <i className="fa fa-lg fa-bars" onClick={this._changeView}></i>
           {this.state.user ? (
-            <button onClick={()=>window.location.replace('https://chloe-typeracer.herokuapp.com/logout')}> <div>Sign Out</div></button>
+            <button onClick={()=>window.location.replace(process.env.REACT_APP_URL+'/logout')}> <div>Sign Out</div></button>
           ) : (
-            <button onClick={()=>window.location.replace('https://chloe-typeracer.herokuapp.com/login/facebook')}> <div> Sign In</div> </button>
+            <button onClick={()=>window.location.replace(process.env.REACT_APP_URL+'/login/facebook')}> <div> Sign In</div> </button>
             )}
         </div>
         {this.state.user ? this.renderGame() : this.renderSignin()}
