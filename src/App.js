@@ -277,6 +277,22 @@ class App extends React.Component {
     )
   }
 
+ logout = async ()=>{
+  res = await fetch(process.env.REACT_APP_URL+'/logout',{
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token ${this.state.token}`
+    }
+  })
+  if (res.ok) {
+    const data = res.json()
+    if (data.success===true){
+      sessonStorage.clear('token')
+      this.setState({user:null})
+    }
+  }
+}
+
   render() {
     console.log("token", this.state.token)
     return (
